@@ -3,6 +3,8 @@ venv_rag/
 __pycache__/
 *.pyc
 *.log
-nohup.out
+*.out
+*.db
 rag_memory.db
-.DS_Store
+debug_*.py
+test_*.py
