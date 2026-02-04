@@ -9,79 +9,94 @@
 
 
 
-Here is the step-by-step procedure of how the Endee RAG project was built, from the very first command to the final deployment. You can include this in your report's "Methodology" section.
-Phase 1: Environment Setup (The Foundation)
-We started by setting up a robust development environment on a Google Cloud VM to handle the heavy AI processing.
-Cloud VM Provisioning:
-Created a Google Cloud Compute Engine instance (e2-standard-4) with Ubuntu 22.04.
-Configured SSH access to securely manage the server remotely.
-System Dependencies:
-Updated the Linux package manager (apt update).
-Installed essential tools: git, curl, python3-pip, cmake, and build-essential (for compiling the C++ backend).
-Python Environment:
-Created a virtual environment to keep libraries organized:
-Bash
-python3 -m venv venv_rag
-source venv_rag/bin/activate
+Here is the comprehensive Methodology & Deployment Guide formatted specifically for your README.md.
 
+You can append this section to your existing README or use it to replace the "Installation" section to reflect the full VM-based "Two-Brain" setup.
+
+⚙️ Methodology: How We Built Endee RAG
+This project was built in 5 Strategic Phases to ensure high performance, modularity, and zero-latency local execution on a Cloud VM.
+
+Phase 1: Environment Setup (The Foundation)
+We established a robust development environment on Google Cloud to handle heavy AI processing.
+
+Cloud Provisioning: Deployed a Google Cloud Compute Engine instance (e2-standard-4) running Ubuntu 22.04.
+
+System Dependencies: Updated Linux repositories and installed essential build tools (git, curl, python3-pip, cmake, build-essential) required for compiling the C++ backend.
+
+Python Isolation: Created a dedicated virtual environment (venv_rag) to manage dependencies cleanly.
 
 Phase 2: The Intelligence Layer (AI Models)
-We set up the local AI "brains" using Ollama so the system could work offline without paying for OpenAI API keys.
-Installing Ollama:
-Ran the official install script: curl -fsSL https://ollama.com/install.sh | sh.
-Pulling Models:
-Downloaded the Llama 3.2 (1B) model for generating answers (lightweight and fast).
-Downloaded the Nomic-Embed-Text model for converting text into vectors.
-Verification:
-Tested the models in the terminal to ensure they could accept prompts and generate text.
+We configured local AI "brains" using Ollama to enable offline capabilities without external API costs.
+
+Engine Setup: Installed the Ollama runtime via the official shell script.
+
+Model Acquisition:
+
+Llama 3.2 (1B): Selected for its lightweight footprint and fast generation speed.
+
+Nomic-Embed-Text: Chosen for high-quality vector embeddings.
+
+Verification: Validated model inference directly in the terminal to ensure system readiness.
+
 Phase 3: The Backend Storage (The "Two-Brain" System)
-We designed a hybrid storage architecture to optimize performance.
+We designed a hybrid storage architecture to optimize for both speed and data integrity.
+
 Vector Database (Endee C++ Server):
-Cloned the custom C++ vector engine repository.
-Compiled the engine using cmake to enable hardware accelerations (AVX2).
-Configured the server to run on Port 8080, exposing endpoints like /insert and /search.
+
+Cloned and compiled the custom C++ vector engine using cmake to enable AVX2 hardware acceleration.
+
+Configured the server to listen on Port 8080, exposing high-performance REST endpoints (/insert, /search).
+
 Text Database (SQLite):
-Designed a relational database schema (user_docs table) to store the raw English text.
-Implemented rag_memory.db to link Vector IDs (from Endee) to actual content.
+
+Designed a relational schema (user_docs table) to store raw English text.
+
+Implemented rag_memory.db to act as the persistent link between Vector IDs and readable content.
+
 Phase 4: The Application Logic (Streamlit Frontend)
-We built the user interface and the "glue" code in Python (app.py).
-UI Construction:
-Used Streamlit to create a clean web interface with tabs for "File Upload" and "Chat".
-Added session state management to handle user logins and chat history.
-Ingestion Pipeline:
-Integrated PyPDF2 and python-docx to extract text from user files.
-Implemented Recursive Text Splitting to chop documents into 1000-character chunks.
-Created the Batch Processor to send vectors to the C++ server and text to SQLite simultaneously.
-Retrieval Logic:
-Built the search function: Input -> Vector -> Endee Search -> ID List -> SQLite Lookup -> LLM Context.
-Phase 5: Deployment & version Control
-1. VM Configuration:
-Provisioned a Google Cloud Compute Engine instance (Ubuntu 22.04).
-Configured Firewall rules to allow traffic on Port 8501 (Streamlit) and Port 8080 (Endee Backend).
-Established SSH access for remote management.
-2. Backend Deployment (The "Endee" Brain):
-Compilation: Compiled the C++ source code directly on the VM using cmake and make to optimize for the specific server CPU (AVX2 instructions).
-Execution: Started the Endee Vector Database as a background daemon using nohup to ensure it keeps running even after SSH disconnection.
+We built the user interface and "glue" logic in Python (app.py).
+
+UI Construction: Developed a clean, tabbed interface ("File Upload", "Chat") using Streamlit, complete with session state management.
+
+Ingestion Pipeline: Integrated PyPDF2 and python-docx for text extraction and implemented Recursive Text Splitting to chunk documents into 1,000-character segments.
+
+Retrieval Logic: Engineered the core search pipeline:
+
+Input → Vector → Endee Search (C++) → ID List → SQLite Lookup → LLM Context
+
+Phase 5: Deployment & Integration (VM-Based)
+Finalizing the deployment of the "Two-Brain" architecture on the cloud VM.
+
+1. VM Configuration
+Provisioned the Ubuntu 22.04 instance.
+
+Configured firewall rules to allow ingress traffic on Port 8501 (Frontend) and Port 8080 (Backend).
+
+Secured remote management via SSH keys.
+
+2. Backend Deployment (The "Endee" Brain)
+Compilation: Built the C++ source code directly on the VM to optimize for the specific CPU instruction set (AVX2).
+
+Execution: Deployed the Vector Database as a background daemon using nohup for persistence.
+
 Bash
+
 nohup ./ndd_server --port 8080 &
+Verification: Confirmed active listening ports using netstat -tuln | grep 8080.
 
+3. Frontend Deployment (The Interface)
+Environment: Activated the venv to isolate Python dependencies.
 
-Verification: Verified the server was listening using netstat -tuln | grep 8080.
-3. Frontend Deployment (The Interface):
-Environment: Set up a dedicated Python virtual environment (venv) to isolate dependencies.
-Execution: Deployed the Streamlit application on Port 8501, also using nohup for persistence.
+Execution: Launched the Streamlit application as a background service.
+
 Bash
+
 nohup streamlit run app.py --server.port 8501 &
+4. Linking Streamlit to Endee
+The critical integration point was established in app.py. We configured the Python EndeeClient to communicate with the local C++ service via the loopback address:
 
-
-4. Linking Streamlit to Endee:
-The critical link was established in app.py via a configuration constant.
-We pointed the Python EndeeClient to the local loopback address of the running C++ service:
 Python
+
 # app.py configuration
 ENDEE_URL = "http://127.0.0.1:8080/api/v1"
-
-
-This enabled the Python frontend to offload heavy vector search tasks to the C++ backend via high-speed HTTP requests (REST API) with zero network latency (since both run on the same VM).
-
-
+Result: This architecture enables the Python frontend to offload computationally expensive vector search tasks to the C++ backend via high-speed HTTP requests, achieving near-zero network latency.
