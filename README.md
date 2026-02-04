@@ -1,3 +1,12 @@
+
+<img width="1357" height="580" alt="a4" src="https://github.com/user-attachments/assets/756c234c-c082-48f2-adf6-b61b042f2eba" />
+<img width="1365" height="594" alt="a3" src="https://github.com/user-attachments/assets/376fa425-5838-4f25-8144-6666ffd9c382" />
+<img width="1034" height="547" alt="a2" src="https://github.com/user-attachments/assets/01562988-6728-4097-9aab-ca9db6f8e9f4" />
+<img width="1017" height="497" alt="a1" src="https://github.com/user-attachments/assets/ae188533-b4b7-42c0-b1bc-1d3faae2a15e" />
+
+
+
+
 # 🚀 Endee RAG: High-Performance Local Search Engine
 
 **Endee RAG** is a "Turbo" Retrieval-Augmented Generation (RAG) application designed for speed and flexibility. It allows users to upload multiple documents (PDF, Word, Text, Markdown), processes them instantly using batch vectorization, and lets users chat with their data using a local LLM.
