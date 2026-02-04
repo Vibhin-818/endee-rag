@@ -1,25 +1,8 @@
-
-# Ignore build directory
-build/
-# Ignore build like directory
-build*/
-# Ignore all files in the build directory
-build/*
-
-# Ignore tests build directory
-tests/build/
-
-# Sometimes data files are created for tetsing
-data/
-data/*
-
-# VS Code directory
-.vscode/
-.vscode/*
-
-# Frontend
-frontend/
-frontend/*
-
-# DS Store
+venv/
+venv_rag/
+__pycache__/
+*.pyc
+*.log
+nohup.out
+rag_memory.db
 .DS_Store
