@@ -7,48 +7,80 @@
 
 
 
-# 🚀 Endee RAG: High-Performance Local Search Engine
 
-**Endee RAG** is a "Turbo" Retrieval-Augmented Generation (RAG) application designed for speed and flexibility. It allows users to upload multiple documents (PDF, Word, Text, Markdown), processes them instantly using batch vectorization, and lets users chat with their data using a local LLM.
+
+# 🚀 Endee RAG: High-Performance Distributed Search Engine
+
+**Endee RAG** is a specialized Retrieval-Augmented Generation (RAG) system capable of "chatting" with documents at lightning speed.
+
+Unlike standard AI apps, Endee RAG uses a **"Two-Brain" Architecture**: it offloads heavy mathematical vector search to a custom **C++ Backend (Endee Server)** while managing user logic in a **Python Frontend**, ensuring zero latency and 100% data privacy on local Cloud VMs.
+
+## 🏗️ System Architecture
+The system operates on a hybrid storage model:
+
+
+
+[Image of client server architecture diagram]
+
+
+1.  **Frontend (The Interface):** Streamlit app that handles file uploads and user queries. It talks to the backend via HTTP API.
+2.  **Backend (The Muscle):** A C++ Vector Database optimized with AVX2 instructions for high-speed similarity search on Port 8080.
+3.  **Intelligence Layer:** Llama 3.2 (LLM) and Nomic Embeddings running locally via Ollama.
+4.  **Text Store:** SQLite database (\`rag_memory.db\`) for storing raw document content.
 
 ## ✨ Key Features
-* **Omni-Format Support:** Upload PDFs, Word Docs (), Text files (), and Markdown ().
-* **⚡ Turbo Processing:** Uses batch ingestion (100 chunks/batch) for 10x faster document loading.
-* **Local Privacy:** Runs entirely offline using **Ollama** (Llama 3.2 + Nomic Embeddings).
-* **Smart Context:** Advanced  for precise answer retrieval.
-* **Instant UI:** Built with **Streamlit** for a responsive, clean user experience.
+* **🚀 Hardware Accelerated:** Uses C++ AVX2 optimizations for millisecond-level vector retrieval.
+* **💾 Hybrid Storage:** Splits data between SQLite (Text) and C++ Engine (Vectors) for maximum efficiency.
+* **📄 Omni-Format Support:** Processes PDFs, Word Docs (\`.docx\`), Text (\`.txt\`), and Markdown (\`.md\`).
+* **🔒 Privacy-First:** Runs entirely offline on your VM. No data leaves your server.
 
 ## 🛠️ Tech Stack
-* **Frontend:** Streamlit
-* **LLM Engine:** Ollama (Llama 3.2:1b)
-* **Embeddings:** Nomic-Embed-Text
-* **Vector Store:** SQLite + Vector Search (Custom Implementation)
-* **Framework:** LangChain
+* **Frontend:** Python 3.10+, Streamlit, LangChain
+* **Backend:** C++ 17, CMake (Custom Vector Engine)
+* **AI Engine:** Ollama (Llama 3.2:1b + Nomic-Embed-Text)
+* **Database:** SQLite + Custom Vector Store
 
-## ⚙️ Installation Guide
+## ⚙️ Installation & Setup (VM Deployment)
 
 ### 1. Prerequisites
-* Python 3.10+
-* [Ollama](https://ollama.com/) installed and running.
+* Ubuntu 20.04/22.04 VM
+* C++ Compiler (GCC) & CMake
+* Python 3.10+ & Pip
 
-### 2. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Pull Required Models
-Make sure your local Ollama instance has the required models:
-```bash
+### 2. Setup Intelligence Layer (Ollama)
+\`\`\`bash
+curl -fsSL https://ollama.com/install.sh | sh
 ollama pull llama3.2:1b
 ollama pull nomic-embed-text
-```
+\`\`\`
 
-## 🚀 How to Run
-Start the application with one command:
+### 3. Build & Start Backend (C++ Server)
+Compile the high-performance engine:
+\`\`\`bash
+mkdir build && cd build
+cmake ..
+make
+\`\`\`
+Start the server in the background (Port 8080):
+\`\`\`bash
+nohup ./ndd_server --port 8080 &
+\`\`\`
 
-```bash
+### 4. Setup & Start Frontend (Python)
+Install dependencies:
+\`\`\`bash
+pip install -r requirements.txt
+\`\`\`
+Start the User Interface:
+\`\`\`bash
 streamlit run app.py
-```
+\`\`\`
+
+## 🚀 Usage
+1.  Open your browser and navigate to \`http://<YOUR-VM-IP>:8501\`.
+2.  **Upload Tab:** Select PDF or Word documents. The system will split them and send vectors to the C++ engine.
+3.  **Chat Tab:** Ask questions. The Python app will query the C++ backend for context and generate an answer using Llama 3.2.
 
 ---
-*Created by [Your Name / Vibhin-818]*
+*Built by Vibhin-818*
+
